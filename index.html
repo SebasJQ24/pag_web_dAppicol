@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Falsa Normalidad</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- VIDEO INTRO -->
+  <div class="video-container">
+    <video id="intro-video" autoplay muted playsinline>
+      <source src="videos/loading_intro.mp4" type="video/mp4">
+    </video>
+
+    <div class="sound-circle" id="sound-circle" title="Silenciar / activar">
+      <img src="icons/sound_icon.png" alt="sound" />
+    </div>
+
+    <div class="overlay" id="overlay">
+      <button id="btn-entrar">ENTRAR A LA EXPERIENCIA</button>
+    </div>  
+  </div>
+
+  <!-- GALERÍA -->
+  <div id="gallery" class="gallery hidden" aria-hidden="true">
+    <img src="icons/case_1.png" alt="Caso 1">
+    <img src="icons/case_2.png" alt="Caso 2">
+    <img src="icons/case_3.png" alt="Caso 3">
+    <img src="icons/case_4.png" alt="Caso 4">
+    <img src="icons/case_5.png" alt="Caso 5">
+    <img src="icons/case_6.png" alt="Caso 6">
+    <img src="icons/case_7.png" alt="Caso 7">
+    <img src="icons/case_8.png" alt="Caso 8">
+    <img src="icons/case_9.png" alt="Caso 9">
+    <img src="icons/case_10.png" alt="Caso 10">
+    <img src="icons/case_11.png" alt="Caso 11">
+    <img src="icons/case_12.png" alt="Caso 12">
+  </div>
+
+  <!-- CASE VIEW -->
+  <div id="case-view" class="case-view hidden" aria-hidden="true">
+    <div class="case-content">
+      <img id="case-image" src="icons/Case_1_sin_bg.png" alt="Caso actual" />
+
+      <div class="case-controls">
+        <button id="btn-prev" aria-label="Anterior">⟨</button>
+        <div id="btn-info" class="amenaza-button">
+            <img src="icons/amenaza_icon.png" alt="Amenaza">
+        </div>
+        <button id="btn-next" aria-label="Siguiente">⟩</button>
+      </div>
+
+      <div class="gallery-button">
+          <img src="icons/gallery_icon.jpg" alt="Galería">
+          <span>GALERÍA</span>
+      </div>
+
+      <div class="audio-button">
+          <img src="icons/sound_icon.png" alt="Audio">
+          <span>AUDIO</span>
+      </div>
+      <audio id="background-audio" loop>
+        <source src="audios/musica_menu.mp3" type="audio/mpeg">
+      </audio>
+
+      <h2 id="case-name">CASO 1</h2>
+      <div class="bottom-menu">
+          <div class="bottom-links">
+              <a href="#" class="menu-link"> FALSA NORMALIDAD </a>
+              <span class="separator"> | </span>
+              <a href="#" class="menu-link"> ¿CÓMO SE HACE? </a>
+              <span class="separator"> | </span>
+              <a href="#" class="menu-link"> COMPARTIR </a>
+          </div>
+          <button class="mini-btn"> DESCARGAR PDF </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPLOSION / ANIMATIC -->
+  <div id="explosion-overlay" class="hidden" aria-hidden="true">
+    <div id="closeX" class="btn-close-x">✖</div>
+    <video id="explosion-video" preload="auto" playsinline></video>
+
+     <!-- BOTÓN VER VIDEO -->
+  <div id="postVideoBtns" class="post-video-buttons hidden">
+    <button id="btn-ver-video">VER VIDEO</button>
+    <button id="btn-ver-stats" class="action-btn">VER ESTADÍSTICAS</button>
+  </div>
+</div>
+
+    <!-- ANIMATIC ONLY -->
+<div id="video-modal" class="video-modal">
+  <div class="btn-close-x">✖</div>
+  <video id="modal-video" playsinline controls>
+    <source src="videos/esclavitud_sexual_animatic.mp4" type="video/mp4">
+  </video>
+</div>
+
+<div id="video-modal" class="video-modal">
+  <div class="btn-close-x">✖</div>
+  <video id="modal-video" playsinline controls>
+    <source src="videos/mendicidad_animatic.mp4" type="video/mp4">
+  </video>
+</div>
+    
+<!-- STATS MODAL -->
+<div id="stats-modal" class="video-modal" style="display:none;">
+  <div id="closeStats" class="btn-close-x">✖</div>
+  <img id="statsImage" src="" alt="Estadísticas del caso" style="max-width:90%; border-radius:14px;">
+</div>
+
+
+<script>
+/* ========== DOM refs ========== */
+const introVideo = document.getElementById('intro-video');
+const soundCircle = document.getElementById('sound-circle');
+const overlay = document.getElementById('overlay');
+const btnEntrar = document.getElementById('btn-entrar');
+
+const gallery = document.getElementById('gallery');
+const caseView = document.getElementById('case-view');
+const caseImage = document.getElementById('case-image');
+const caseName = document.getElementById('case-name');
+const btnPrev = document.getElementById('btn-prev');
+const btnNext = document.getElementById('btn-next');
+const btnInfo = document.getElementById('btn-info');
+
+const explosionOverlay = document.getElementById("explosion-overlay");
+const explosionVideo = document.getElementById("explosion-video");
+const closeX = document.getElementById("closeX");
+const postVideoBtns = document.getElementById("postVideoBtns");
+const btnVerVideo = document.getElementById("btn-ver-video");
+
+const videoModal = document.getElementById('video-modal');
+const modalVideo = document.getElementById('modal-video');
+const modalClose = videoModal.querySelector('.btn-close-x');
+
+const audioButton = document.querySelector('.audio-button');
+const backgroundAudio = document.getElementById('background-audio');
+
+const btnVerStats = document.getElementById("btn-ver-stats");
+const statsModal = document.getElementById("stats-modal");
+const closeStats = document.getElementById("closeStats");
+const statsImage = document.getElementById("statsImage");
+
+/* ========== VARIABLES ========== */
+let showButtonsTimeout;
+let snapshot = { time: 0, isVisible: false };
+let currentCase = 0;
+let isAudioPlaying = false;
+
+/* ========== INTRO behaviour ========== */
+introVideo.playbackRate = 1.2;
+soundCircle.addEventListener('click', () => {
+  introVideo.muted = !introVideo.muted;
+  soundCircle.classList.toggle('active', !introVideo.muted);
+});
+setTimeout(() => overlay.classList.add('visible'), 30000);
+btnEntrar.addEventListener('click', () => {
+   document.querySelector('.video-container').classList.add('zoom-fade-out');
+  setTimeout(() => {
+    document.querySelector('.video-container').style.display = 'none';
+    showCase(0);
+  }, 900);
+});
+
+/* ========== CASES data ========== */
+const cases = [
+  { img: "icons/Case_1_sin_bg.png", name: "CASO 1 | Esclavitud Sexual", explosionVideo: "videos/esclavitud_sexual_pc.mp4", animatic: "videos/esclavitud_sexual_animatic.mp4",statsImage: "icons/poster_ESSEX.jpg" },
+  { img: "icons/Case_2_sin_bg.png", name: "CASO 2 | Mendicidad Forzada", explosionVideo: "videos/mendicidad_shatter_pc.mp4", animatic: "videos/mendicidad_animatic.mp4", statsImage: "icons/poster_MENFOR.png"
+ },
+  { img: "icons/Case_3_sin_bg.png", name: "CASO 3 | Matrimonio Forzado" },
+  { img: "icons/Case_4_sin_bg.png", name: "CASO 4 | Manipulación Psicológica" },
+  { img: "icons/Case_5_sin_bg.png", name: "CASO 5 | Tráfico de Órganos" },
+  { img: "icons/Case_6_sin_bg.png", name: "CASO 6 | Amenaza Laboral" },
+  { img: "icons/Case_7_sin_bg.png", name: "CASO 7 | Esclavitud en Fábricas" },
+  { img: "icons/Case_8_sin_bg.png", name: "CASO 8 | Migración Forzada" },
+  { img: "icons/Case_9_sin_bg.png", name: "CASO 9 | Trabajo Forzoso" },
+  { img: "icons/Case_10_sin_bg.png", name: "CASO 10 | Reclutamiento Forzado" },
+  { img: "icons/Case_11_sin_bg.png", name: "CASO 11 | Servidumbre Forzada" },
+  { img: "icons/Case_12_sin_bg.png", name: "CASO 12 | Explotación Infantil" }
+];
+
+/* ========== FUNCIONES ========== */
+function showCase(index) {
+  if (index < 0 || index >= cases.length) index = 0;
+  currentCase = index;
+  caseImage.src = cases[index].img;
+  caseName.textContent = cases[index].name;
+  gallery.classList.add('hidden');
+  caseView.classList.remove('hidden');
+  setTimeout(() => caseView.classList.add('visible'), 20);
+}
+
+/* ========== Navigation ========== */
+btnNext.addEventListener('click', () => {
+  currentCase = (currentCase + 1) % cases.length;
+  showCase(currentCase);
+});
+btnPrev.addEventListener('click', () => {
+  currentCase = (currentCase - 1 + cases.length) % cases.length;
+  showCase(currentCase);
+});
+document.querySelector('.gallery-button').addEventListener('click', () => {
+  caseView.classList.remove('visible');
+  setTimeout(() => {
+    caseView.classList.add('hidden');
+    gallery.classList.remove('hidden');
+    setTimeout(() => gallery.classList.add('visible'), 30);
+  }, 300);
+});
+document.querySelectorAll('.gallery img').forEach((img, idx) => {
+  img.addEventListener('click', () => {
+    gallery.classList.remove('visible');
+    setTimeout(() => {
+      gallery.classList.add('hidden');
+      showCase(idx);
+    }, 260);
+  });
+});
+
+
+// Función que muestra X, VER VIDEO y VER ESTADÍSTICAS después de cierto tiempo
+
+function scheduleButtons(delay = 2000) {
+  closeX.classList.remove("visible");
+
+  // Ocultar ambos botones
+  btnVerVideo.classList.remove("show");
+  btnVerStats.classList.remove("show");
+
+  // Mostrar contenedor, pero NO botones aún
+  postVideoBtns.style.display = "flex";
+
+  if (showButtonsTimeout) clearTimeout(showButtonsTimeout);
+
+  // Mostrar AMBOS botones al mismo tiempo después del delay
+  showButtonsTimeout = setTimeout(() => {
+    closeX.classList.add("visible");
+    btnVerVideo.classList.add("show");
+    btnVerStats.classList.add("show");   // ← AQUI DEBE IR
+    snapshot.time = explosionVideo.currentTime;
+    snapshot.isVisible = true;
+  }, delay);
+}
+
+// Botón audio menú principal
+audioButton.addEventListener('click', () => {
+  if (isAudioPlaying) {
+    backgroundAudio.pause();
+    isAudioPlaying = false;
+    audioButton.style.opacity = 0.6; // efecto visual "apagado"
+  } else {
+    backgroundAudio.play();
+    isAudioPlaying = true;
+    audioButton.style.opacity = 1;   // efecto visual "encendido"
+  }
+});
+
+// Botón INFO → abrir video de amenaza según caso
+btnInfo.addEventListener("click", () => {
+  const current = cases[currentCase];
+  if (!current.explosionVideo) return;
+
+  explosionOverlay.classList.remove("hidden");
+  explosionVideo.src = current.explosionVideo;
+  explosionVideo.currentTime = 0;
+  explosionVideo.play();
+  scheduleButtons(3000);
+});
+
+// Botón VER VIDEO → abrir animatic según caso
+
+btnVerVideo.addEventListener('click', () => {
+  const current = cases[currentCase];  // obtiene el caso actual
+  if (!current.animatic) return;       // si no hay animatic, no hace nada
+
+  videoModal.style.display = 'flex';   // muestra el modal
+  modalVideo.src = current.animatic;   // asigna el animatic del caso
+  modalVideo.currentTime = 0;          // reinicia el video
+  modalVideo.play();                   // reproduce
+});
+
+// Cerrar modal con la X
+modalClose.addEventListener('click', () => {
+  modalVideo.pause();
+  videoModal.style.display = 'none';
+});
+
+// Cerrar modal si se hace clic fuera del video
+videoModal.addEventListener('click', (e) => {
+  if (e.target === videoModal) {
+    modalVideo.pause();
+    videoModal.style.display = 'none';
+  }
+});
+
+// Cuando termine el animatic → volver al video de amenaza
+explosionVideo.addEventListener("ended", () => {
+  const current = cases[currentCase];
+  if (current.animatic && explosionVideo.src.includes(current.animatic)) {
+    explosionVideo.src = current.explosionVideo;
+    explosionVideo.currentTime = snapshot.time || 0;
+    explosionVideo.play();
+
+    closeX.style.top = "5%";
+    closeX.style.left = "50%";
+    closeX.style.width = "42px";
+    closeX.style.height = "42px";
+
+    if (snapshot.isVisible) {
+      postVideoBtns.style.display = "flex";
+      btnVerVideo.classList.add("show");
+    }
+  }
+});
+
+// Botón ver estadísticas
+
+btnVerStats.addEventListener("click", () => {
+    const current = cases[currentCase];
+
+    if (!current.statsImage) return; // ahora sí existe
+
+    statsImage.src = current.statsImage;
+
+    statsModal.style.display = "flex";
+    closeStats.style.display = "block";
+});
+
+// Cuando termine el poster → volver al video de amenaza
+
+closeStats.addEventListener("click", () => {
+  statsModal.style.display = "none";   // Cierra modal de stats
+
+  // Restaurar overlay de amenaza (igual que volver del animatic)
+  explosionOverlay.classList.remove("hidden");
+
+  // Mostrar botones si ya estaban visibles
+  if (snapshot.isVisible) {
+    postVideoBtns.style.display = "flex";
+    btnVerVideo.classList.add("show");
+    btnVerStats.classList.add("show");
+  }
+});
+
+// Botón X → cierra overlay y pausa video
+closeX.addEventListener("click", () => {
+  explosionVideo.pause();
+  explosionVideo.currentTime = 0;
+  explosionOverlay.classList.add("hidden");
+  btnVerVideo.classList.remove("show");
+  postVideoBtns.style.display = "none";
+});
+</script>
+</body>
+</html>
